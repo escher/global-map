@@ -1,0 +1,8 @@
+{
+  "maps": [
+    "iJO1366.Central metabolism.json",
+    "iJO1366.Fatty acid beta-oxidation.json",
+    "iJO1366.Fatty acid biosynthesis (saturated).json"
+  ],
+  "model": "iJO1366.json"
+}
