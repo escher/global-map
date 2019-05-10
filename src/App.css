@@ -21,4 +21,5 @@ body {
   right: 0px;
   width: 100% !important;
   height: 100% !important;
+  background-image: radial-gradient(#fffbfb, #e5dfdf);
 }

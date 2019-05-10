@@ -19,7 +19,7 @@ export default class Force extends Component {
   drawEscher (d, sel, callback) {
     const builder = new Builder(
       d.mapData,
-      null,
+      model,
       null,
       sel,
       {
@@ -55,11 +55,14 @@ export default class Force extends Component {
   }
 
   renderForce (node) {
+    const radiusScale = 1.5
+
     const topNode = d3.select(node)
     const { width, height } = topNode.node().getBoundingClientRect()
 
     const nodes = [ map1, map2, map3 ].map(mapData => ({
       radius: Math.min(width, height) / 4,
+      aspectRatio: mapData[1].canvas.height / mapData[1].canvas.width,
       mapData
     }))
 
@@ -78,8 +81,8 @@ export default class Force extends Component {
           .join(
             enter => enter.append('div')
               .style('background-color', 'grey')
-              .style('width', d => `${d.radius * 1.5}px`)
-              .style('height', d => `${d.radius * 1.5}px`)
+              .style('width', d => `${d.radius * radiusScale}px`)
+              .style('height', d => `${d.radius * radiusScale * d.aspectRatio}px`)
               .style('position', 'absolute')
               .call(
                 d3.drag()
@@ -107,6 +110,10 @@ export default class Force extends Component {
                           builder.fullScreen()
                         }
                       })
+                      .style('width', '100%')
+                      .style('height', '100%')
+                      .style('box-shadow', '0px 0px 17px 4px #888888')
+                      .append('div')
                       .style('width', '100%')
                       .style('height', '100%')
                 drawEscher(d, sel, builder => {
