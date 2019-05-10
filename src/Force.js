@@ -16,7 +16,7 @@ const data = _.chain(model.reactions)
       .value()
 
 export default class Force extends Component {
-  drawEscher (d, sel) {
+  drawEscher (d, sel, callback) {
     const builder = new Builder(
       d.mapData,
       null,
@@ -30,25 +30,25 @@ export default class Force extends Component {
         never_ask_before_quit: true,
         simplified: true,
         scroll_behavior: 'none',
-        // full_screen_button: {
-        //   enable_editing: true,
-        //   scroll_behavior: 'pan',
-        //   menu: 'all',
-        //   simplified: false
-        // },
+        full_screen_button: {
+          enable_editing: true,
+          scroll_behavior: 'pan',
+          menu: 'all',
+          simplified: false
+        },
         first_load_callback: builder => {
           // no interactions
           builder.none_mode()
+          builder.callback_manager.set('full_screen', isFullScreen => {
+            builder.map.draw_everything()
+            if (!isFullScreen) {
+              builder.none_mode()
+            } else {
+              builder.zoom_mode()
+            }
+          })
+          callback(builder)
         }
-        //   builder.callback_manager.set('full_screen', isFullScreen => {
-        //     builder.map.draw_everything()
-        //     if (!isFullScreen) {
-        //       builder.none_mode()
-        //     } else {
-        //       builder.zoom_mode()
-        //     }
-        //   })
-        // }
       }
     )
     d.builder = builder
@@ -72,6 +72,7 @@ export default class Force extends Component {
           .force('y', forceY)
 
     const drawEscher = this.drawEscher.bind(this)
+    const builders = Array(nodes.length)
     const box = topNode.selectAll('div')
           .data(nodes)
           .join(
@@ -97,9 +98,20 @@ export default class Force extends Component {
                     d.fy = null
                   })
               )
-              .each(function (d) {
-                const sel = d3.select(this).append('div').style('width', '100%').style('height', '100%')
-                drawEscher(d, sel)
+              .each(function (d, i) {
+                const sel = d3.select(this)
+                      .append('div')
+                      .on('click', () => {
+                        const builder = builders[i]
+                        if (builder && !builder.isFullScreen) {
+                          builder.fullScreen()
+                        }
+                      })
+                      .style('width', '100%')
+                      .style('height', '100%')
+                drawEscher(d, sel, builder => {
+                  builders[i] = builder
+                })
               })
           )
 
